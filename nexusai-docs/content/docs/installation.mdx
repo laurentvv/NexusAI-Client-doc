@@ -1,0 +1,86 @@
+---
+title: Installation
+description: How to install NexusAI-Client in your Python projects.
+---
+
+# Installation 📦
+
+NexusAI-Client requires **Python 3.12** or higher. It is intentionally designed with zero heavy dependencies, relying exclusively on `httpx` and `python-dotenv`.
+
+---
+
+## 🚀 Package Managers
+
+### With `uv` (Recommended)
+
+[`uv`](https://github.com/astral-sh/uv) is the fastest Python package manager:
+
+```bash
+uv add nexusai-client
+```
+
+### With `pip`
+
+```bash
+pip install nexusai-client
+```
+
+### With `poetry`
+
+```bash
+poetry add nexusai-client
+```
+
+---
+
+## 🛠️ Development & Git Options
+
+### Install from Git Repository
+
+To track the latest unreleased updates directly from GitHub:
+
+```bash
+# With uv
+uv add git+https://github.com/laurentvv/NexusAI-Client.git
+
+# With pip
+pip install git+https://github.com/laurentvv/NexusAI-Client.git
+```
+
+### Local Editable Mode (Monorepo)
+
+For local development or contributing to NexusAI-Client:
+
+```bash
+# With uv
+uv add --editable /path/to/NexusAI-Client
+
+# With pip
+pip install -e /path/to/NexusAI-Client
+```
+
+### In `pyproject.toml`
+
+```toml
+[project]
+dependencies = [
+    "nexusai-client>=0.1.0",
+]
+```
+
+---
+
+## ✅ Verify Installation
+
+Verify that the installation succeeded by running this one-line command:
+
+```bash
+python -c "import nexusai_client; print('NexusAI-Client v' + nexusai_client.__version__)"
+```
+
+Expected output:
+```text
+NexusAI-Client v0.1.0
+```
+
+Next, proceed to the [Configuration Guide](./configuration) to configure your API keys.

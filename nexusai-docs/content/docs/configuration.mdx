@@ -1,0 +1,83 @@
+---
+title: Configuration
+description: Configure API keys, environment variables, and fallback parameters.
+---
+
+# Configuration ⚙️
+
+NexusAI-Client automatically loads credentials from your system environment or a local `.env` file at the root of your project.
+
+---
+
+## 🔑 Environment Variables (`.env`)
+
+Create a `.env` file in the working directory where your Python application runs:
+
+```bash
+# ==============================================================================
+# Priority 1: 100% FREE ZERO-COST TIERS (Recommended for zero-cost operation)
+# ==============================================================================
+GEMINI_FREE_API_KEY=AIzaSy...              # Google AI Studio Free Tier (1M Context)
+GROQ_API_KEY=gsk_...                       # Groq Cloud LPU (Ultra-fast Llama 3.3)
+CEREBRAS_API_KEY=csk-...                   # Cerebras CS-3 Wafer-Scale Engine
+COHERE_API_KEY=...                         # Cohere Free Trial (Command R+)
+NVIDIA_API_KEY=nvapi-...                   # Nvidia NIM (1,000 Free Credits)
+OPENROUTER_API_KEY=sk-or-v1-...            # OpenRouter (19 Free Models Live)
+MISTRAL_API_KEY=...                        # Mistral AI (Codestral & Small)
+
+# ==============================================================================
+# Priority 2: ULTRA-LOW-COST PAID BACKUP TIERS (Safety nets)
+# ==============================================================================
+DEEPSEEK_API_KEY=sk-...                    # DeepSeek V3 / R1 ($0.27 / 1M tokens)
+GEMINI_PRO_API_KEY=AIzaSy...               # Google Cloud Gemini 2.5 Pro (Pay-as-you-go)
+```
+
+> [!TIP]
+> You only need to configure the providers you intend to use. When using `AIGateway.auto_fallback()`, NexusAI-Client automatically detects all present keys and skips unconfigured providers.
+
+---
+
+## ⚡ Direct Initialization (Without `.env`)
+
+You can also pass API keys, custom base URLs, or custom timeouts directly when instantiating `AIGateway`:
+
+```python
+from nexusai_client import AIGateway
+
+# Pass explicit credentials and custom parameters
+async with AIGateway(
+    "groq",
+    api_key="gsk_custom_key_here",
+    model="llama-3.3-70b-versatile",
+    timeout=30.0,
+) as client:
+    res = await client.generate_text("Hello Groq!")
+    print(res.text)
+```
+
+---
+
+## 🌐 Custom Base URLs (Proxies & Gateways)
+
+If you use an internal proxy, caching gateway, or custom endpoint:
+
+```python
+async with AIGateway(
+    "deepseek",
+    api_key="sk-...",
+    base_url="https://my-internal-proxy.company.internal/v1",
+) as client:
+    res = await client.generate_text("Hello from behind proxy!")
+```
+
+---
+
+## ⏱️ Timeout Management
+
+NexusAI-Client defaults to a generous timeout suitable for heavy reasoning models. You can override it globally or per-request:
+
+```python
+# Set a 15-second network timeout for this gateway instance
+async with AIGateway("gemini_free", timeout=15.0) as client:
+    res = await client.generate_text("Quick summarize...")
+```

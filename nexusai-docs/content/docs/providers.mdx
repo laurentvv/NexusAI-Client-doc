@@ -1,0 +1,114 @@
+---
+title: Supported Providers
+description: Complete matrix and specifications for all 9 supported AI providers.
+---
+
+# Supported Providers 🌐
+
+NexusAI-Client unifies leading zero-cost tiers and high-performance commercial AI APIs under a standardized protocol.
+
+---
+
+## 📊 Summary Matrix
+
+| Provider | Identifiers | Tier | Protocol | Default Model | Vision | Live Quotas & Balances |
+| :--- | :--- | :--- | :--- | :--- | :---: | :--- |
+| **Cerebras** | `"cerebras"`, `"cerebras_free"` | Free | OpenAI Chat API | `gpt-oss-120b` | ❌ | 30 RPM \| 60k TPM \| 1M tok/day |
+| **Cohere** | `"cohere"`, `"cohere_free"` | Free Trial | Cohere V2 REST | `command-r-plus-08-2024` | ✅ | 20 RPM \| 1,000 calls/month |
+| **DeepSeek** | `"deepseek"` | Paid | OpenAI Chat API | `deepseek-chat` | ❌ | Live USD Balance (`GET /user/balance`) |
+| **Gemini Free** | `"gemini_free"`, `"gemini"` | Free | Gemini REST | `gemini-2.5-flash` | ✅ | 15 RPM \| 1M TPM \| 1,500 RPD |
+| **Gemini Pro** | `"gemini_pro"` | Paid | Gemini REST | `gemini-2.5-pro` | ✅ | Google Cloud Pay-as-you-go Billing |
+| **Groq** | `"groq"`, `"groq_free"` | Free | OpenAI Chat API | `llama-3.3-70b-versatile` | ❌ | 30 RPM \| 14,400 RPD \| 30k TPM |
+| **Mistral AI** | `"mistral"`, `"mistral_free"` | Free / Paid | OpenAI Chat API | `mistral-small-latest` | ✅ | Free Dev Models (`codestral-latest`, etc.) |
+| **Nvidia NIM** | `"nvidia_free"`, `"nvidia"` | Free | OpenAI Chat API | `meta/llama-3.1-8b-instruct` | ✅ | 1,000 Free GPU Credits (NGC) |
+| **OpenRouter** | `"openrouter"`, `"openrouter_free"` | Free / Paid | OpenAI Chat API | `openrouter/free` | ✅ | 19 Free Models + 390 Commercial Models |
+
+---
+
+## 🔍 Provider Deep Dives
+
+### 1. Cerebras (`"cerebras"`)
+- **Key Advantage**: Powered by the CS-3 Wafer-Scale engine, providing record-breaking generation speeds of **2,000+ tokens/second**.
+- **Free Quotas**: 30 Requests/min, 60k Tokens/min, 1,000,000 tokens/day on free tier.
+- **Protocol**: OpenAI-compatible REST API.
+
+```python
+async with AIGateway("cerebras") as client:
+    res = await client.generate_text("Explain quantum entanglement in 1 sentence.")
+    print(res.text)
+```
+
+---
+
+### 2. Cohere (`"cohere"`)
+- **Key Advantage**: Native integration with Cohere's **Command R+** enterprise reasoning models and **Aya Vision** multilingual multimodal models.
+- **Protocol**: Cohere V2 REST API (`/v2/chat`).
+- **Vision Support**: Yes, pass image paths or URLs to `analyze_image()`.
+
+```python
+async with AIGateway("cohere") as client:
+    res = await client.generate_text("Analyze the market implications of semiconductor tariffs.")
+    print(res.text)
+```
+
+---
+
+### 3. DeepSeek (`"deepseek"`)
+- **Key Advantage**: Industry-leading ultra-low-cost pricing ($0.27 / 1M input tokens) with **DeepSeek-V3** and **DeepSeek-R1** reasoning.
+- **Budget Inspection**: NexusAI-Client queries DeepSeek's live `/user/balance` endpoint to report exact remaining USD credits.
+
+```python
+async with AIGateway("deepseek") as client:
+    account = await client.get_account_info()
+    print(account.format_summary())
+    # Output: "Solde restant: $4.99 | Consommé: $0.0120"
+```
+
+---
+
+### 4. Google Gemini Free (`"gemini_free"`)
+- **Key Advantage**: **1,000,000 token context window** available 100% free on Google AI Studio.
+- **Default Model**: `gemini-2.5-flash`.
+- **Vision Support**: Native multimodal image and document parsing.
+
+```python
+async with AIGateway("gemini_free") as client:
+    res = await client.generate_text("Summarize the top 5 papers on multi-agent LLM systems.")
+    print(res.text)
+```
+
+---
+
+### 5. Google Gemini Pro (`"gemini_pro"`)
+- **Key Advantage**: High-capacity Google Cloud Vertex/Studio tier with zero rate-limit constraints, ideal as an enterprise fallback.
+- **Default Model**: `gemini-2.5-pro`.
+
+---
+
+### 6. Groq Cloud LPU (`"groq"`)
+- **Key Advantage**: Ultra-low latency inference powered by custom Tensor Streaming Processors (LPUs).
+- **Default Model**: `llama-3.3-70b-versatile`.
+- **Free Quotas**: 30 Requests/min, 14,400 Requests/day.
+
+```python
+async with AIGateway("groq") as client:
+    async for chunk in client.stream_text("Write a short poem about speed."):
+        print(chunk, end="", flush=True)
+```
+
+---
+
+### 7. Mistral AI (`"mistral"`)
+- **Key Advantage**: Access to **Codestral** (specialized code generation) and **Pixtral** (vision), with developer-tier access.
+- **Vision Support**: Supported via `pixtral-12b-2409`.
+
+---
+
+### 8. Nvidia NIM (`"nvidia_free"`)
+- **Key Advantage**: 1,000 free GPU credits provided via Nvidia NGC API catalog, hosting Llama 3.1, Nemotron, and Mistral models.
+
+---
+
+### 9. OpenRouter (`"openrouter"`)
+- **Key Advantage**: Catalog of **670+ AI models** with dynamic token pricing and 19 free-tier endpoints (`openrouter/free`, `google/gemini-2.0-flash-thinking-exp:free`, etc.).
+- **Discovery**: Automatically discovers pricing and free tags dynamically via `list_models()`.

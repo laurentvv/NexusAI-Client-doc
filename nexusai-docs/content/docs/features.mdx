@@ -1,0 +1,169 @@
+---
+title: Core Features
+description: Deep dive into fallback routing, streaming, multimodal vision, structured JSON, and budget inspection.
+---
+
+# Core Features ⚡
+
+NexusAI-Client gives you a standardized, high-performance toolkit for building production AI applications.
+
+---
+
+## 1. Zero-Cost-First Smart Fallback
+
+Automatic progression from 100% free models to ultra-low-cost commercial models. If a free provider throws HTTP 429 (Rate Limit), times out, or experiences a network outage, NexusAI-Client transparently tries the next provider in the chain.
+
+### Automatic Discovery:
+```python
+import asyncio
+from nexusai_client import AIGateway
+
+async def main():
+    # Detects active keys in .env and routes: Free Tiers -> Paid Backups
+    async with AIGateway.auto_fallback() as client:
+        res = await client.generate_text("Explain transformer attention mechanisms.")
+        print(f"Generated via: [{res.provider}] / Model: [{res.model}]")
+        print(res.text)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+### Custom Priority Chain:
+```python
+# Custom explicit chain: Cerebras -> Groq -> Gemini Free -> DeepSeek
+custom_chain = ["cerebras", "groq", "gemini_free", "deepseek"]
+
+async with AIGateway.with_fallback(custom_chain, timeout=20.0) as client:
+    res = await client.generate_text("Summarize the news.")
+    print(f"[{res.provider}] {res.text}")
+```
+
+---
+
+## 2. Real-Time Token Streaming (SSE)
+
+Stream generated chunks asynchronously using Python `async for`:
+
+```python
+import asyncio
+from nexusai_client import AIGateway
+
+async def main():
+    async with AIGateway("groq") as client:
+        print("Streaming token-by-token:")
+        async for chunk in client.stream_text("Write a short story about artificial intelligence."):
+            print(chunk, end="", flush=True)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+> [!NOTE]
+> Streaming is also fully supported when using `FallbackGateway` (`AIGateway.auto_fallback()`)!
+
+---
+
+## 3. Multimodal Vision Analysis
+
+Analyze screenshots, charts, PDFs, or photos. You can supply:
+- A local file path (`Path` or `str`)
+- A remote image URL (`https://...`)
+- Raw image bytes (`bytes`)
+
+```python
+import asyncio
+from nexusai_client import AIGateway
+
+async def main():
+    # Automatically selects the best available Vision model (Gemini 2.5 Flash, Llama 3.2 Vision, Aya Vision, Pixtral)
+    async with AIGateway.auto_fallback_vision() as client:
+        res = await client.analyze_image(
+            prompt="Extract the invoice line items, tax rate, and total amount as JSON.",
+            image="invoice_sample.png",
+            json_mode=True,
+        )
+        print(f"Vision provider: {res.provider}")
+        print(res.text)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+---
+
+## 4. Guaranteed Structured JSON Mode
+
+Standardize JSON outputs across all providers by setting `json_mode=True`:
+
+```python
+import asyncio
+import json
+from nexusai_client import AIGateway
+
+async def main():
+    async with AIGateway("groq") as client:
+        res = await client.generate_text(
+            prompt="Extract user profile from: 'John Doe, 32, Lead AI Architect at Zurich'",
+            system_prompt="Output schema: {'name': str, 'age': int, 'role': str, 'city': str}",
+            json_mode=True,
+        )
+        data = json.loads(res.text)
+        print("Parsed JSON data:", data)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+---
+
+## 5. Live Balances & Quota Monitoring
+
+Inspect account credits and quota limits in real-time:
+
+```python
+import asyncio
+from nexusai_client import AIGateway
+
+async def main():
+    # 1. Single provider inspection
+    async with AIGateway("deepseek") as client:
+        account = await client.get_account_info()
+        print(account.format_summary())
+        # Example output: "Solde restant: $4.99 | (Offert: $0.00) | Consommé: $0.0120"
+
+    # 2. Parallel inspection across all configured providers
+    all_accounts = await AIGateway.get_all_account_infos()
+    for prov_name, info in all_accounts.items():
+        print(f"[{prov_name.upper()}]: {info.format_summary()}")
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+---
+
+## 6. Model Catalog Discovery & Dynamic Pricing
+
+Query live model catalogs and per-million token pricing across all connected providers:
+
+```python
+import asyncio
+from nexusai_client import AIGateway
+
+async def main():
+    # List free models across OpenRouter
+    async with AIGateway("openrouter") as client:
+        models = await client.list_models(free_only=True)
+        print(f"Found {len(models)} free models on OpenRouter:")
+        for m in models[:5]:
+            print(f" - {m.id} (Context: {m.context_length} tokens)")
+
+    # Parallel discovery across all providers
+    catalog = await AIGateway.list_all_available_models(free_only=True)
+    for prov, m_list in catalog.items():
+        print(f"Provider [{prov}] offers {len(m_list)} free models.")
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```

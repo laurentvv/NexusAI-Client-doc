@@ -1,0 +1,68 @@
+---
+title: Introduction
+description: Unified, strictly-typed, asynchronous Python 3.12+ gateway for multi-provider AI APIs.
+---
+
+# NexusAI-Client ⚡
+
+<p className="flex flex-wrap gap-2 not-prose my-4">
+  <a href="https://pypi.org/project/nexusai-client/" target="_blank"><img src="https://img.shields.io/pypi/v/nexusai-client.svg?style=flat-square&logo=pypi&logoColor=white" alt="PyPI" /></a>
+  <a href="https://www.python.org/downloads/" target="_blank"><img src="https://img.shields.io/badge/python-3.12+-3776AB.svg?style=flat-square&logo=python&logoColor=white" alt="Python 3.12+" /></a>
+  <a href="https://github.com/astral-sh/uv" target="_blank"><img src="https://img.shields.io/badge/package_manager-uv-DE5FE9.svg?style=flat-square" alt="uv" /></a>
+  <a href="https://peps.python.org/pep-0561/" target="_blank"><img src="https://img.shields.io/badge/typing-PEP_561_Strict-blue.svg?style=flat-square" alt="Typing" /></a>
+  <a href="https://opensource.org/licenses/MIT" target="_blank"><img src="https://img.shields.io/badge/license-MIT-green.svg?style=flat-square" alt="License" /></a>
+</p>
+
+**NexusAI-Client** is an ultra-lightweight, strictly-typed, asynchronous Python 3.12+ gateway for multi-provider AI APIs. It unifies **Cerebras, Cohere, DeepSeek, Google Gemini (Free & Pro), Groq, Mistral, Nvidia NIM, and OpenRouter** behind a single, elegant interface with **zero heavy vendor SDK dependencies**.
+
+---
+
+## 💡 Why NexusAI-Client?
+
+Modern AI applications frequently need to juggle between multiple LLM providers for cost optimization, high throughput, and high availability. Traditionally, this required installing **8 or 9 separate proprietary SDKs** (`google-genai`, `openai`, `groq`, `cohere`, `mistralai`, etc.).
+
+This practice leads to:
+- Dozens of conflicting transitive dependencies and bloating container sizes.
+- Incompatible async models and diverging parameter names.
+- Slow startup and excessive memory overhead.
+
+**NexusAI-Client fixes this from the ground up:**
+
+- 🪶 **Zero Heavyweight Dependencies**: Powered purely by `httpx` and `python-dotenv`.
+- ⚡ **Native Asynchronous & SSE Streaming**: Stream responses token-by-token in real time via `stream_text()` and `stream_chat()`.
+- 🔄 **Zero-Cost-First Smart Fallback**: Automatic progression from 100% Free Tiers (Gemini, Groq, Cerebras, Cohere, Nvidia, OpenRouter, Mistral) to Paid Backups (`AIGateway.auto_fallback()`).
+- 🚀 **Hardware Accelerators**: Tap into Groq LPUs and Cerebras CS-3 Wafer-Scale engines (2,000+ tokens/sec).
+- 🧠 **Enterprise Reasoning & Search**: Command R+ and DeepSeek R1 native integration.
+- 🎯 **Guaranteed JSON Outputs**: Native `json_mode=True` across all supported providers.
+- 💰 **Live Account & Budget Inspection**: Inspect real-time balances (USD, NGC credits) and rate limits (RPM, TPM, RPD).
+- 🔍 **670+ Models Discovered Live**: Automatic detection of free-tier models (`:free`) and accurate per-million-token pricing.
+
+---
+
+## 🌟 1-Minute Quick Start
+
+```python
+import asyncio
+from nexusai_client import AIGateway
+
+async def main():
+    # Automatically discovers active keys in .env and routes: Free -> Free -> Paid
+    async with AIGateway.auto_fallback() as client:
+        response = await client.generate_text("Explain quantum computing in 2 sentences.")
+        print(f"✅ Served by [{response.provider}] with zero downtime:")
+        print(response.text)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+---
+
+## 🧭 Explore the Documentation
+
+- [**Installation**](/docs/installation): How to install via `pip`, `uv`, or `poetry`.
+- [**Configuration**](/docs/configuration): Setting up environment variables and API keys.
+- [**Providers Matrix**](/docs/providers): Complete breakdown of all 9 supported providers.
+- [**Core Features**](/docs/features): Streaming, vision analysis, fallback routing, and quota inspections.
+- [**Cookbooks & Recipes**](/docs/recipes): FastAPI microservices, chat sessions, and background workers.
+- [**API Reference**](/docs/api-reference): Detailed signatures for classes, methods, models, and exceptions.

@@ -1,0 +1,222 @@
+---
+title: API Reference
+description: Complete specification of classes, methods, models, and exceptions in NexusAI-Client.
+---
+
+# API Reference 📚
+
+Complete technical reference for NexusAI-Client classes, data structures, and exception types.
+
+---
+
+## 1. `AIGateway` Class
+
+The primary entry point and factory class.
+
+### Static / Class Methods
+
+#### `AIGateway.auto_fallback(*, prioritize_free: bool = True, timeout: float = 60.0, **kwargs) -> FallbackGateway`
+Automatically discovers all active keys in the environment, builds a failover chain prioritizing zero-cost free tiers before paid models, and returns an initialized `FallbackGateway`.
+
+#### `AIGateway.auto_fallback_vision(*, prioritize_free: bool = True, timeout: float = 60.0, **kwargs) -> FallbackGateway`
+Builds an automatic failover chain across active multimodal vision providers (`gemini_free`, `nvidia_free`, `cohere_free`, `mistral`, `openrouter`, `gemini_pro`).
+
+#### `AIGateway.with_fallback(providers: list[str | BaseAIProvider], *, timeout: float = 60.0, **kwargs) -> FallbackGateway`
+Instantiates a `FallbackGateway` with an explicit list of provider identifiers or instances.
+
+#### `AIGateway.create(provider: str, *, api_key: str | None = None, base_url: str | None = None, model: str | None = None, timeout: float | None = None, **kwargs) -> BaseAIProvider`
+Factory method returning an initialized concrete provider instance.
+
+#### `AIGateway.get_configured_providers(*, prioritize_free: bool = True) -> list[str]`
+Returns the list of provider identifiers that have valid API keys present in the current environment.
+
+#### `AIGateway.available_providers() -> list[str]`
+Returns a list of all provider strings supported by the registry.
+
+#### `AIGateway.list_all_available_models(providers: list[str] | None = None, *, free_only: bool = False) -> dict[str, list[ModelInfo]]`
+Queries multiple providers in parallel to aggregate model catalogs.
+
+#### `AIGateway.get_all_account_infos(providers: list[str] | None = None) -> dict[str, AccountInfo]`
+Queries budget, credits, and rate limits in parallel across multiple providers.
+
+---
+
+### Instance Methods
+
+All methods below are available on `AIGateway` and `FallbackGateway` instances:
+
+#### `async generate_text(...) -> AIResponse`
+```python
+async def generate_text(
+    self,
+    prompt: str,
+    *,
+    system_prompt: str | None = None,
+    model: str | None = None,
+    temperature: float = 0.7,
+    max_tokens: int | None = None,
+    json_mode: bool = False,
+    **kwargs: Any,
+) -> AIResponse
+```
+
+#### `async analyze_image(...) -> AIResponse`
+```python
+async def analyze_image(
+    self,
+    prompt: str,
+    image: str | Path | bytes,
+    *,
+    system_prompt: str | None = None,
+    model: str | None = None,
+    temperature: float = 0.2,
+    max_tokens: int | None = None,
+    json_mode: bool = False,
+    **kwargs: Any,
+) -> AIResponse
+```
+
+#### `async chat(...) -> AIResponse`
+```python
+async def chat(
+    self,
+    messages: list[ChatMessage | dict[str, str]],
+    *,
+    model: str | None = None,
+    temperature: float = 0.7,
+    max_tokens: int | None = None,
+    json_mode: bool = False,
+    **kwargs: Any,
+) -> AIResponse
+```
+
+#### `stream_text(...) -> AsyncIterator[str]`
+```python
+def stream_text(
+    self,
+    prompt: str,
+    *,
+    system_prompt: str | None = None,
+    model: str | None = None,
+    temperature: float = 0.7,
+    max_tokens: int | None = None,
+    **kwargs: Any,
+) -> AsyncIterator[str]
+```
+
+#### `stream_chat(...) -> AsyncIterator[str]`
+```python
+def stream_chat(
+    self,
+    messages: list[ChatMessage | dict[str, str]],
+    *,
+    model: str | None = None,
+    temperature: float = 0.7,
+    max_tokens: int | None = None,
+    **kwargs: Any,
+) -> AsyncIterator[str]
+```
+
+#### `async list_models(*, free_only: bool = False) -> list[ModelInfo]`
+Fetches the catalog of available models for this provider.
+
+#### `async get_account_info() -> AccountInfo`
+Fetches remaining balance, granted credits, usage, and rate limits.
+
+#### `async close() -> None`
+Closes underlying HTTP connection pools. (Automatically handled when using `async with`).
+
+---
+
+## 2. Data Models
+
+### `ChatMessage`
+```python
+@dataclass(slots=True, kw_only=True, frozen=True)
+class ChatMessage:
+    role: Literal["system", "user", "assistant"]
+    content: str
+    def to_dict(self) -> dict[str, str]: ...
+```
+
+### `AIResponse`
+```python
+@dataclass(slots=True, kw_only=True)
+class AIResponse:
+    text: str
+    provider: str
+    model: str
+    usage: UsageInfo | None = None
+    finish_reason: str | None = None
+    raw_response: dict[str, Any] = field(default_factory=dict)
+```
+
+### `UsageInfo`
+```python
+@dataclass(slots=True, kw_only=True, frozen=True)
+class UsageInfo:
+    prompt_tokens: int = 0
+    completion_tokens: int = 0
+    total_tokens: int = 0
+```
+
+### `ModelPricing`
+```python
+@dataclass(slots=True, kw_only=True)
+class ModelPricing:
+    prompt_per_million: float = 0.0
+    completion_per_million: float = 0.0
+    cache_read_per_million: float | None = None
+
+    @property
+    def is_free(self) -> bool: ...
+    def format_pricing(self) -> str: ...
+    def calculate_cost(self, prompt_tokens: int, completion_tokens: int) -> float: ...
+```
+
+### `ModelInfo`
+```python
+@dataclass(slots=True, kw_only=True)
+class ModelInfo:
+    id: str
+    name: str
+    provider: str
+    is_free: bool = False
+    context_length: int | None = None
+    pricing: ModelPricing | None = None
+    description: str | None = None
+    raw_data: dict[str, Any] = field(default_factory=dict)
+```
+
+### `AccountInfo`
+```python
+@dataclass(slots=True, kw_only=True)
+class AccountInfo:
+    provider: str
+    total_balance: float | None = None
+    granted_balance: float | None = None
+    topped_up_balance: float | None = None
+    total_usage: float | None = None
+    currency: str = "USD"
+    is_free_tier: bool = False
+    rate_limit_info: str | None = None
+    extra_details: dict[str, Any] = field(default_factory=dict)
+
+    def format_summary(self) -> str: ...
+```
+
+---
+
+## 3. Exceptions Hierarchy
+
+All exceptions raised by NexusAI-Client inherit from `NexusAIError`:
+
+```text
+NexusAIError (Base exception)
+├── MissingAPIKeyError     (API key not configured in .env or arguments)
+├── AuthenticationError    (HTTP 401 / 403 invalid API key)
+├── RateLimitError         (HTTP 429 quota or rate-limit exceeded)
+├── APITimeoutError        (Network or generation timeout)
+├── APIConnectionError     (Host unreachable or network connection failure)
+└── ProviderNotFoundError  (Unknown provider identifier passed to factory)
+```

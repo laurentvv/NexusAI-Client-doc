@@ -1,0 +1,191 @@
+---
+title: Cookbooks & Recipes
+description: Practical patterns and production blueprints for web frameworks, chat sessions, and agents.
+---
+
+# Cookbooks & Recipes 🍳
+
+Ready-to-use patterns for integrating NexusAI-Client into real-world applications.
+
+---
+
+## 1. Generic Single-Prompt Helper
+
+A reusable asynchronous helper function for one-off completions:
+
+```python
+import asyncio
+from nexusai_client import AIGateway
+
+async def ask_ai(
+    prompt: str,
+    provider: str = "groq",
+    system_prompt: str | None = None,
+    temperature: float = 0.3,
+) -> str:
+    """Send a prompt to any supported AI provider and return the generated text."""
+    async with AIGateway(provider=provider) as client:
+        response = await client.generate_text(
+            prompt=prompt,
+            system_prompt=system_prompt,
+            temperature=temperature,
+        )
+        return response.text
+
+# Example
+async def main():
+    reply = await ask_ai(
+        prompt="Suggest 3 catchy domain names for an AI analytics platform.",
+        system_prompt="You are a creative branding expert.",
+        provider="groq",
+    )
+    print(reply)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+---
+
+## 2. Stateful Multi-Turn Chat Session
+
+Manage multi-turn dialogues with message history memory:
+
+```python
+import asyncio
+from nexusai_client import AIGateway, ChatMessage
+
+class AIChatSession:
+    """Manages an ongoing multi-turn conversation with memory."""
+
+    def __init__(self, provider: str = "mistral", system_prompt: str = "You are a helpful Python tutor.") -> None:
+        self.provider = provider
+        self.history: list[ChatMessage] = [
+            ChatMessage(role="system", content=system_prompt)
+        ]
+
+    async def send_message(self, user_text: str) -> str:
+        """Append user message, query AI, and store assistant reply."""
+        self.history.append(ChatMessage(role="user", content=user_text))
+
+        async with AIGateway(self.provider) as client:
+            response = await client.chat(messages=self.history)
+            self.history.append(ChatMessage(role="assistant", content=response.text))
+            return response.text
+
+# Example
+async def main():
+    chat = AIChatSession(provider="mistral")
+    
+    rep1 = await chat.send_message("How do I initialize an empty dictionary in Python?")
+    print(f"Assistant: {rep1}\n")
+
+    rep2 = await chat.send_message("How do I add a key to it?")
+    print(f"Assistant (with context): {rep2}")
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+---
+
+## 3. Specialized Code Generation (Codestral)
+
+Targeting Mistral's Codestral model for clean, strictly-typed code generation:
+
+```python
+import asyncio
+from nexusai_client import AIGateway
+
+async def generate_python_code(task_description: str) -> str:
+    system = "You are a Principal Software Engineer. Provide clean, PEP 8 compliant, strictly-typed Python code."
+    
+    async with AIGateway("mistral") as client:
+        response = await client.generate_text(
+            prompt=f"Task: {task_description}",
+            system_prompt=system,
+            model="codestral-latest",
+            temperature=0.1,
+        )
+        return response.text
+
+async def main():
+    code = await generate_python_code("an asynchronous rate limiter with leaky bucket algorithm")
+    print(code)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+---
+
+## 4. FastAPI Endpoint Integration
+
+Deploy a zero-downtime AI microservice with FastAPI:
+
+```python
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from nexusai_client import AIGateway, NexusAIError, RateLimitError
+
+app = FastAPI(title="NexusAI Microservice")
+
+class GenerationRequest(BaseModel):
+    prompt: str
+    provider: str = "gemini_free"
+    system_prompt: str | None = None
+    temperature: float = 0.5
+
+class GenerationResponse(BaseModel):
+    result: str
+    provider: str
+    model: str
+    tokens_used: int | None
+
+@app.post("/api/generate", response_model=GenerationResponse)
+async def generate_text_endpoint(req: GenerationRequest):
+    try:
+        # Use auto_fallback for zero downtime
+        async with AIGateway.auto_fallback() as client:
+            res = await client.generate_text(
+                prompt=req.prompt,
+                system_prompt=req.system_prompt,
+                temperature=req.temperature,
+            )
+            return GenerationResponse(
+                result=res.text,
+                provider=res.provider,
+                model=res.model,
+                tokens_used=res.usage.total_tokens if res.usage else None,
+            )
+    except RateLimitError as e:
+        raise HTTPException(status_code=429, detail=f"Rate limit exceeded: {e.message}")
+    except NexusAIError as e:
+        raise HTTPException(status_code=500, detail=f"AI Provider error: {e.message}")
+
+# Run with: uvicorn main:app --reload
+```
+
+---
+
+## 5. CLI Diagnostic Utilities
+
+NexusAI-Client includes CLI diagnostic tools to audit your accesses and explore live models:
+
+### Real-Time Access & Latency Verification
+```bash
+uv run python verify_access.py
+```
+*Validates `.env` keys, inspects real-time balances, tests inference, and measures network latency in milliseconds.*
+
+### Live Catalog Explorer (670+ Models)
+```bash
+# List free-tier models only
+uv run python list_all_models.py --free
+
+# Search by keyword (e.g., llama, r1, command, sonnet)
+uv run python list_all_models.py --search llama
+
+# Export complete catalog with pricing to JSON
+uv run python list_all_models.py --export models_catalog.json
+```
