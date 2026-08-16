@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.VERCEL_URL
       ? `https://${process.env.VERCEL_URL}`
-      : 'https://nexusai-client-doc.vercel.app',
+      : 'https://nexus-ai-client-doc.vercel.app',
   ),
   title: {
     template: '%s | NexusAI-Client',
