@@ -22,7 +22,7 @@
 
 ## 📖 About This Repository
 
-This repository contains the source code for the official documentation website of **[NexusAI-Client](https://github.com/laurentvv/NexusAI-Client)**, an ultra-lightweight, strictly-typed, asynchronous Python 3.12+ gateway for multi-provider AI APIs (Cerebras, Cohere, DeepSeek, Google Gemini Free & Pro, Groq, Mistral, Nvidia NIM, and OpenRouter).
+This repository contains the source code for the official documentation website of **[NexusAI-Client](https://github.com/laurentvv/NexusAI-Client)**, an ultra-lightweight, strictly-typed, asynchronous Python 3.12+ gateway for multi-provider AI APIs (Cerebras, Cohere, DeepSeek, Google Gemini Free & Pro, Groq, Mistral, Nvidia NIM, OpenRouter, and OrcaRouter).
 
 > [!NOTE]
 > This repository is dedicated solely to the documentation site and its Vercel hosting. For the Python library source code, automated test suite, and issue tracker, please visit the primary repository: **[laurentvv/NexusAI-Client](https://github.com/laurentvv/NexusAI-Client)**.

@@ -209,12 +209,12 @@ export default function HomePage() {
         <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold text-white tracking-tight max-w-5xl leading-[1.1]">
           One Unified Client. <br className="hidden sm:inline" />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">
-            9 AI Providers. Zero Bloat.
+            10 AI Providers. Zero Bloat.
           </span>
         </h1>
 
         <p className="mt-6 text-lg sm:text-xl text-neutral-400 max-w-3xl leading-relaxed">
-          Stop installing 9 separate heavyweight SDKs. Unify <strong>Cerebras, Cohere, DeepSeek, Google Gemini, Groq, Mistral, Nvidia NIM, and OpenRouter</strong> behind a strictly-typed, asynchronous interface with zero-cost failover.
+          Stop installing 10 separate heavyweight SDKs. Unify <strong>Cerebras, Cohere, DeepSeek, Google Gemini, Groq, Mistral, Nvidia NIM, OpenRouter, and OrcaRouter</strong> behind a strictly-typed, asynchronous interface with zero-cost failover.
         </p>
 
         {/* Action Buttons */}
@@ -280,13 +280,14 @@ export default function HomePage() {
             <span className="text-xs text-neutral-500 font-mono">Auto-Failover on Rate-Limit (429) / Timeout</span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-8 gap-3 mb-8">
             {[
               { name: 'Gemini Free', desc: '1M Context • AI Studio', color: 'border-emerald-500/40 text-emerald-300' },
               { name: 'Groq LPU', desc: 'Llama 3.3 70B • 30 RPM', color: 'border-emerald-500/40 text-emerald-300' },
               { name: 'Cerebras', desc: 'CS-3 Engine • 2k tok/s', color: 'border-emerald-500/40 text-emerald-300' },
               { name: 'Nvidia NIM', desc: '1,000 GPU Credits', color: 'border-emerald-500/40 text-emerald-300' },
               { name: 'OpenRouter', desc: '19 Free Models Live', color: 'border-emerald-500/40 text-emerald-300' },
+              { name: 'OrcaRouter', desc: 'Qwen & DeepSeek Free', color: 'border-emerald-500/40 text-emerald-300' },
               { name: 'Cohere', desc: 'Command R+ Trial', color: 'border-emerald-500/40 text-emerald-300' },
               { name: 'Mistral', desc: 'Codestral & Small', color: 'border-emerald-500/40 text-emerald-300' },
             ].map((node, i) => (
@@ -493,6 +494,13 @@ export default function HomePage() {
                 <td className="p-4"><span className="px-2 py-0.5 rounded bg-teal-500/10 text-teal-300 border border-teal-500/20 text-xs">Free / Paid</span></td>
                 <td className="p-4">openrouter/free</td>
                 <td className="p-4 text-neutral-400">19 Free Models + 390 Commercial</td>
+              </tr>
+              <tr>
+                <td className="p-4 font-bold text-white">OrcaRouter</td>
+                <td className="p-4 text-emerald-400">"orcarouter"</td>
+                <td className="p-4"><span className="px-2 py-0.5 rounded bg-teal-500/10 text-teal-300 border border-teal-500/20 text-xs">Free / Paid</span></td>
+                <td className="p-4">qwen/qwen3.8-27b-free</td>
+                <td className="p-4 text-neutral-400">Zero-Margin Gateway • Free Models (-free)</td>
               </tr>
               <tr>
                 <td className="p-4 font-bold text-white">Cohere</td>

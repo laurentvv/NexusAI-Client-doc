@@ -1,6 +1,6 @@
 ---
 title: Supported Providers
-description: Complete matrix and specifications for all 9 supported AI providers.
+description: Complete matrix and specifications for all 10 supported AI providers.
 ---
 
 # Supported Providers 🌐
@@ -22,6 +22,7 @@ NexusAI-Client unifies leading zero-cost tiers and high-performance commercial A
 | **Mistral AI** | `"mistral"`, `"mistral_free"` | Free / Paid | OpenAI Chat API | `mistral-small-latest` | ✅ | Free Dev Models (`codestral-latest`, etc.) |
 | **Nvidia NIM** | `"nvidia_free"`, `"nvidia"` | Free | OpenAI Chat API | `meta/llama-3.1-8b-instruct` | ✅ | 1,000 Free GPU Credits (NGC) |
 | **OpenRouter** | `"openrouter"`, `"openrouter_free"` | Free / Paid | OpenAI Chat API | `openrouter/free` | ✅ | 19 Free Models + 390 Commercial Models |
+| **OrcaRouter** | `"orcarouter"`, `"orcarouter_free"` | Free / Paid | OpenAI Chat API | `qwen/qwen3.8-27b-free` | ❌ | Zero-margin routing + Free tier models (`-free`) |
 
 ---
 
@@ -112,3 +113,17 @@ async with AIGateway("groq") as client:
 ### 9. OpenRouter (`"openrouter"`)
 - **Key Advantage**: Catalog of **670+ AI models** with dynamic token pricing and 19 free-tier endpoints (`openrouter/free`, `google/gemini-2.0-flash-thinking-exp:free`, etc.).
 - **Discovery**: Automatically discovers pricing and free tags dynamically via `list_models()`.
+
+---
+
+### 10. OrcaRouter (`"orcarouter"`)
+- **Key Advantage**: Multi-provider zero-margin gateway offering transparent routing and access to high-performance free models (`qwen/qwen3.8-27b-free`, DeepSeek, Llama).
+- **Free Models Detection**: Automatically detects zero-cost models ending with `-free` or `:free`.
+- **Protocol**: OpenAI-compatible REST API (`https://api.orcarouter.ai/v1`).
+- **Quota & Balance**: Fixed minute/daily windows with prompt token limit inspection.
+
+```python
+async with AIGateway("orcarouter") as client:
+    res = await client.generate_text("Explain the benefits of zero-margin AI routing.")
+    print(res.text)
+```
