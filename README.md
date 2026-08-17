@@ -34,7 +34,7 @@ This repository contains the source code for the official documentation website 
 The code is located in the `nexusai-docs/` subdirectory, following modern documentation repository conventions:
 
 - `/nexusai-docs`: The Next.js 16.3 application powered by [Fumadocs](https://fumadocs.vercel.app/).
-  - `/content/docs`: Markdown/MDX documentation covering Installation, Configuration, Provider Matrix, Core Features, Cookbooks & Recipes, and API Reference.
+  - `/content/docs`: Markdown/MDX documentation covering Installation, Configuration, Provider Matrix, Core Features (including Universal Tool Calling & Function Calling), Cookbooks & Recipes (Autonomous AI Agents), and API Reference.
   - `/src/app`: App Router structure, landing page, documentation layout, search routes, OpenGraph image generators, and `llms.txt` endpoints.
   - `/src/components`: UI components and AI search modal.
   - `/public/assets`: Static assets, banners, and preview screenshots.

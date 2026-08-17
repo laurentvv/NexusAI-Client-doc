@@ -167,3 +167,74 @@ async def main():
 if __name__ == "__main__":
     asyncio.run(main())
 ```
+
+---
+
+## 7. Universal Tool Calling & Function Calling
+
+Equip AI models with external tools, database queries, calculators, or API integrations. 
+
+NexusAI-Client provides a **universal standard schema** that works identically across all supported providers. Under the hood, it transparently translates schemas and payloads into provider-native formats:
+- **OpenAI-Compatible Providers** (Groq, Cerebras, Mistral, DeepSeek, Nvidia NIM, OpenRouter, OrcaRouter): standard `tools` array with `type: "function"`.
+- **Google Gemini REST API** (`gemini_free`, `gemini_pro`): automatically translated to Gemini's `functionDeclarations` and `functionCall` / `functionResponse` parts.
+- **Cohere V2 REST API** (`cohere`): translated to Cohere's V2 tool calling format.
+
+### Defining Tools:
+
+```python
+from nexusai_client import FunctionDefinition, ToolDefinition
+
+weather_tool = ToolDefinition(
+    function=FunctionDefinition(
+        name="get_current_weather",
+        description="Retrieve the current temperature and conditions for a given city.",
+        parameters={
+            "type": "object",
+            "properties": {
+                "location": {
+                    "type": "string",
+                    "description": "City and state/country, e.g. 'Tokyo, Japan'",
+                },
+                "unit": {
+                    "type": "string",
+                    "enum": ["celsius", "fahrenheit"],
+                    "description": "Temperature unit",
+                },
+            },
+            "required": ["location"],
+        },
+    )
+)
+```
+
+### Executing a Tool-Aware Chat Request:
+
+```python
+import asyncio
+from nexusai_client import AIGateway, ChatMessage
+
+async def main():
+    # Tools work seamlessly across single providers and auto-fallback chains!
+    async with AIGateway.auto_fallback() as client:
+        messages = [
+            ChatMessage(role="user", content="What is the weather like in Tokyo right now?")
+        ]
+        
+        response = await client.chat(messages=messages, tools=[weather_tool])
+
+        if response.has_tool_calls:
+            for call in response.tool_calls:
+                print(f"🔧 Tool ID       : {call.id}")
+                print(f"📌 Function Name : {call.name}")
+                print(f"📦 Arguments     : {call.arguments}")
+                # e.g. Arguments: {'location': 'Tokyo, Japan', 'unit': 'celsius'}
+        else:
+            print("💬 Normal Text Reply:", response.text)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+> [!TIP]
+> For building complete multi-turn autonomous agent loops that execute local Python functions and feed outputs back into the model, check out the [Autonomous AI Agent Recipe](/docs/recipes#5-autonomous-ai-agent-with-tool-calling).
+

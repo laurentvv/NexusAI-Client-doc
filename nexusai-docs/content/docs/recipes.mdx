@@ -168,7 +168,115 @@ async def generate_text_endpoint(req: GenerationRequest):
 
 ---
 
-## 5. CLI Diagnostic Utilities
+## 5. Autonomous AI Agent with Tool Calling
+
+Build full autonomous agent execution loops (ReAct pattern) that query local tools, database functions, or web APIs, and feed the results back to the LLM until reaching a final conclusion:
+
+```python
+import asyncio
+import json
+from nexusai_client import (
+    AIGateway,
+    ChatMessage,
+    FunctionDefinition,
+    ToolCall,
+    ToolDefinition,
+)
+
+# 1. Define your local Python functions
+def execute_database_query(sql_query: str) -> str:
+    """Simulated local database query execution."""
+    print(f"⚡ [Executing SQL]: {sql_query}")
+    return json.dumps({
+        "status": "success",
+        "rows": [
+            {"id": 101, "user": "Alice", "plan": "Enterprise", "balance_usd": 4500.00},
+            {"id": 102, "user": "Bob", "plan": "Free", "balance_usd": 0.00},
+        ]
+    })
+
+# 2. Define standard ToolDefinition schema
+sql_tool = ToolDefinition(
+    function=FunctionDefinition(
+        name="execute_database_query",
+        description="Execute a read-only SQL query on the PostgreSQL customer database.",
+        parameters={
+            "type": "object",
+            "properties": {
+                "sql_query": {
+                    "type": "string",
+                    "description": "Valid PostgreSQL query, e.g. SELECT * FROM users WHERE plan = 'Enterprise'",
+                }
+            },
+            "required": ["sql_query"],
+        },
+    )
+)
+
+TOOL_REGISTRY = {
+    "execute_database_query": execute_database_query,
+}
+
+# 3. Autonomous ReAct Agent Loop
+async def run_sql_agent(user_question: str) -> str:
+    messages: list[ChatMessage] = [
+        ChatMessage(
+            role="system",
+            content="You are an expert data analyst assistant. Use the provided tools to answer user database questions.",
+        ),
+        ChatMessage(role="user", content=user_question),
+    ]
+
+    # Auto-fallback ensures your agent stays alive even if one provider hits rate limits
+    async with AIGateway.auto_fallback() as client:
+        # Step 1: Initial model call with tools
+        response = await client.chat(messages=messages, tools=[sql_tool])
+
+        # Step 2: Handle model tool requests
+        if response.has_tool_calls:
+            # Append assistant message with requested tool calls to dialogue history
+            messages.append(
+                ChatMessage(
+                    role="assistant",
+                    content=response.text,
+                    tool_calls=response.tool_calls,
+                )
+            )
+
+            # Execute each requested tool locally
+            for tool_call in response.tool_calls:
+                fn = TOOL_REGISTRY.get(tool_call.name)
+                if fn:
+                    tool_output = fn(**tool_call.arguments)
+                    
+                    # Feed tool execution output back as a 'tool' role message
+                    messages.append(
+                        ChatMessage(
+                            role="tool",
+                            name=tool_call.name,
+                            tool_call_id=tool_call.id,
+                            content=tool_output,
+                        )
+                    )
+
+            # Step 3: Second model call to summarize the final answer with tool outputs
+            final_response = await client.chat(messages=messages)
+            return final_response.text
+
+        return response.text
+
+# --- Example Run ---
+async def main():
+    result = await run_sql_agent("What is the account balance and subscription plan for Alice?")
+    print("\n🤖 Final Agent Answer:\n" + result)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+---
+
+## 6. CLI Diagnostic Utilities
 
 NexusAI-Client includes CLI diagnostic tools to audit your accesses and explore live models:
 
@@ -189,3 +297,4 @@ uv run python list_all_models.py --search llama
 # Export complete catalog with pricing to JSON
 uv run python list_all_models.py --export models_catalog.json
 ```
+

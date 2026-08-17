@@ -60,6 +60,9 @@ const EyeIcon = () => (
 const ShieldIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
 );
+const WrenchIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+);
 const DollarIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
 );
@@ -86,6 +89,36 @@ async def main():
         )
         print(f"Served by [{response.provider}] with zero downtime:")
         print(response.text)
+
+if __name__ == "__main__":
+    asyncio.run(main())`,
+  tools: `# Universal Tool Calling / Function Calling Across All Providers
+import asyncio
+from nexusai_client import AIGateway, ChatMessage, FunctionDefinition, ToolDefinition
+
+weather_tool = ToolDefinition(
+    function=FunctionDefinition(
+        name="get_current_weather",
+        description="Get current temperature for a city.",
+        parameters={
+            "type": "object",
+            "properties": {
+                "location": {"type": "string", "description": "City name"},
+                "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]},
+            },
+            "required": ["location"],
+        },
+    )
+)
+
+async def main():
+    async with AIGateway.auto_fallback() as client:
+        messages = [ChatMessage(role="user", content="What is the weather in Tokyo?")]
+        response = await client.chat(messages=messages, tools=[weather_tool])
+
+        if response.has_tool_calls:
+            for call in response.tool_calls:
+                print(f"🔧 Tool: {call.name} | Args: {call.arguments}")
 
 if __name__ == "__main__":
     asyncio.run(main())`,
@@ -343,6 +376,7 @@ export default function HomePage() {
             <div className="flex items-center gap-1">
               {[
                 { id: 'fallback', label: 'Auto Fallback' },
+                { id: 'tools', label: 'Tool Calling' },
                 { id: 'stream', label: 'SSE Streaming' },
                 { id: 'vision', label: 'Multimodal Vision' },
                 { id: 'chat', label: 'Multi-Turn Chat' },
@@ -381,11 +415,11 @@ export default function HomePage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <SpotlightCard>
             <div className="h-10 w-10 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mb-5">
-              <BoltIcon />
+              <WrenchIcon />
             </div>
-            <h4 className="text-lg font-bold text-white">Zero Heavy SDKs</h4>
+            <h4 className="text-lg font-bold text-white">Universal Tool Calling</h4>
             <p className="text-neutral-400 text-sm mt-2 leading-relaxed">
-              Powered exclusively by <code className="text-emerald-300 font-mono">httpx</code> and <code className="text-emerald-300 font-mono">python-dotenv</code>. No bulky vendor SDK conflicts or slow import times.
+              Equip AI agents with callable Python functions. Standard schema translated automatically to OpenAI format, Gemini <code className="text-emerald-300 font-mono">functionDeclarations</code>, and Cohere V2 tools.
             </p>
           </SpotlightCard>
 
@@ -411,6 +445,16 @@ export default function HomePage() {
 
           <SpotlightCard>
             <div className="h-10 w-10 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mb-5">
+              <BoltIcon />
+            </div>
+            <h4 className="text-lg font-bold text-white">Zero Heavy SDKs</h4>
+            <p className="text-neutral-400 text-sm mt-2 leading-relaxed">
+              Powered exclusively by <code className="text-emerald-300 font-mono">httpx</code> and <code className="text-emerald-300 font-mono">python-dotenv</code>. No bulky vendor SDK conflicts or slow import times.
+            </p>
+          </SpotlightCard>
+
+          <SpotlightCard>
+            <div className="h-10 w-10 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mb-5">
               <EyeIcon />
             </div>
             <h4 className="text-lg font-bold text-white">Multimodal Vision</h4>
@@ -426,16 +470,6 @@ export default function HomePage() {
             <h4 className="text-lg font-bold text-white">Live Quota & Balances</h4>
             <p className="text-neutral-400 text-sm mt-2 leading-relaxed">
               Inspect real-time USD balances, NGC credits, and rate limits (RPM, TPM, RPD) directly from Python.
-            </p>
-          </SpotlightCard>
-
-          <SpotlightCard>
-            <div className="h-10 w-10 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mb-5">
-              <ShieldIcon />
-            </div>
-            <h4 className="text-lg font-bold text-white">Strict PEP 561 Typing</h4>
-            <p className="text-neutral-400 text-sm mt-2 leading-relaxed">
-              Full Python 3.12+ type hints, dataclasses, and custom error classes for clean IDE autocompletion and robust error handling.
             </p>
           </SpotlightCard>
         </div>

@@ -80,11 +80,13 @@ async def analyze_image(
 ```python
 async def chat(
     self,
-    messages: list[ChatMessage | dict[str, str]],
+    messages: list[ChatMessage | dict[str, Any]],
     *,
     model: str | None = None,
     temperature: float = 0.7,
     max_tokens: int | None = None,
+    tools: list[ToolDefinition | dict[str, Any]] | None = None,
+    tool_choice: str | dict[str, Any] | None = None,
     json_mode: bool = False,
     **kwargs: Any,
 ) -> AIResponse
@@ -108,7 +110,7 @@ def stream_text(
 ```python
 def stream_chat(
     self,
-    messages: list[ChatMessage | dict[str, str]],
+    messages: list[ChatMessage | dict[str, Any]],
     *,
     model: str | None = None,
     temperature: float = 0.7,
@@ -128,15 +130,54 @@ Closes underlying HTTP connection pools. (Automatically handled when using `asyn
 
 ---
 
-## 2. Data Models
+## 2. Data Models & Tool Definitions
+
+### `ToolDefinition`
+```python
+@dataclass(slots=True, kw_only=True)
+class ToolDefinition:
+    type: Literal["function"] = "function"
+    function: FunctionDefinition | dict[str, Any]
+
+    def to_dict(self) -> dict[str, Any]: ...
+```
+
+### `FunctionDefinition`
+```python
+@dataclass(slots=True, kw_only=True)
+class FunctionDefinition:
+    name: str
+    description: str | None = None
+    parameters: dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> dict[str, Any]: ...
+```
+
+### `ToolCall`
+```python
+@dataclass(slots=True, kw_only=True, frozen=True)
+class ToolCall:
+    id: str
+    name: str
+    arguments: dict[str, Any] = field(default_factory=dict)
+    raw_arguments: str = ""
+
+    def to_dict(self) -> dict[str, Any]: ...
+```
 
 ### `ChatMessage`
 ```python
+type MessageRole = Literal["system", "user", "assistant", "tool"]
+
 @dataclass(slots=True, kw_only=True, frozen=True)
 class ChatMessage:
-    role: Literal["system", "user", "assistant"]
-    content: str
-    def to_dict(self) -> dict[str, str]: ...
+    role: MessageRole
+    content: str = ""
+    name: str | None = None
+    tool_call_id: str | None = None
+    tool_calls: list[ToolCall] = field(default_factory=list)
+
+    def to_dict(self) -> dict[str, Any]: ...
 ```
 
 ### `AIResponse`
@@ -148,7 +189,13 @@ class AIResponse:
     model: str
     usage: UsageInfo | None = None
     finish_reason: str | None = None
+    tool_calls: list[ToolCall] = field(default_factory=list)
     raw_response: dict[str, Any] = field(default_factory=dict)
+
+    @property
+    def has_tool_calls(self) -> bool:
+        """Return True if the model requested one or more tool/function calls."""
+        return len(self.tool_calls) > 0
 ```
 
 ### `UsageInfo`
