@@ -317,7 +317,7 @@ export default function HomePage() {
           <div className="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-8 gap-3 mb-8">
             {[
               { name: 'Gemini Free', desc: '1M Context • AI Studio', color: 'border-emerald-500/40 text-emerald-300' },
-              { name: 'Groq LPU', desc: 'Llama 3.3 70B • 30 RPM', color: 'border-emerald-500/40 text-emerald-300' },
+              { name: 'Groq LPU', desc: 'gpt-oss-120b • 30 RPM', color: 'border-emerald-500/40 text-emerald-300' },
               { name: 'Cerebras', desc: 'CS-3 Engine • 2k tok/s', color: 'border-emerald-500/40 text-emerald-300' },
               { name: 'Nvidia NIM', desc: '1,000 GPU Credits', color: 'border-emerald-500/40 text-emerald-300' },
               { name: 'OpenRouter', desc: '19 Free Models Live', color: 'border-emerald-500/40 text-emerald-300' },
@@ -513,7 +513,7 @@ export default function HomePage() {
                 <td className="p-4 font-bold text-white">Groq</td>
                 <td className="p-4 text-emerald-400">"groq"</td>
                 <td className="p-4"><span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 text-xs">Free</span></td>
-                <td className="p-4">llama-3.3-70b-versatile</td>
+                <td className="p-4">openai/gpt-oss-120b</td>
                 <td className="p-4 text-neutral-400">LPU Ultra-Fast • 30 RPM / 14.4k RPD</td>
               </tr>
               <tr>

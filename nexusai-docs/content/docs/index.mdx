@@ -28,12 +28,13 @@ This practice leads to:
 
 **NexusAI-Client fixes this from the ground up:**
 
+- 🔄 **Dynamic Model Management & Auto-Rotation**: Automatic failover on HTTP 404/400 (deprecated models), HTTP 429 rate limits, and timeouts across models and providers.
 - 🪶 **Zero Heavyweight Dependencies**: Powered purely by `httpx` and `python-dotenv`.
 - ⚡ **Native Asynchronous & SSE Streaming**: Stream responses token-by-token in real time via `stream_text()` and `stream_chat()`.
 - 🔄 **Zero-Cost-First Smart Fallback**: Automatic progression from 100% Free Tiers (Gemini, Groq, Cerebras, Cohere, Nvidia, OpenRouter, OrcaRouter, Mistral) to Paid Backups (`AIGateway.auto_fallback()`).
 - 🛠️ **Universal Tool Calling / Function Calling**: Standardized function schema, automatic JSON argument parsing, and multi-turn agent loops across Groq, Cerebras, Mistral, DeepSeek, Gemini REST, Cohere V2, and Nvidia NIM.
-- 🚀 **Hardware Accelerators**: Tap into Groq LPUs and Cerebras CS-3 Wafer-Scale engines (2,000+ tokens/sec).
-- 🧠 **Enterprise Reasoning & Search**: Command R+ and DeepSeek R1 native integration.
+- 🚀 **World-Record Hardware Accelerators**: Tap into Groq LPUs and Cerebras CS-3 Wafer-Scale engines (2,000+ tokens/sec).
+- 🧠 **Enterprise Reasoning & Search Models**: Native Cohere Command R+, DeepSeek R1, and Qwen 3.8 models.
 - 🎯 **Guaranteed JSON Outputs**: Native `json_mode=True` across all supported providers.
 - 💰 **Live Account & Budget Inspection**: Inspect real-time balances (USD, NGC credits) and rate limits (RPM, TPM, RPD).
 - 🔍 **670+ Models Discovered Live**: Automatic detection of free-tier models (`:free`, `-free`) and accurate per-million-token pricing.
