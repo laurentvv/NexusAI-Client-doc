@@ -506,8 +506,8 @@ export default function HomePage() {
                 <td className="p-4 font-bold text-white">Google Gemini Free</td>
                 <td className="p-4 text-emerald-400">"gemini_free"</td>
                 <td className="p-4"><span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 text-xs">Free</span></td>
-                <td className="p-4">gemini-2.5-flash</td>
-                <td className="p-4 text-neutral-400">1M Context • 15 RPM / 1,500 RPD</td>
+                <td className="p-4">gemini-3.5-flash-lite</td>
+                <td className="p-4 text-neutral-400">Auto-Rotation (11 Models) • 15 RPM / 500 RPD</td>
               </tr>
               <tr>
                 <td className="p-4 font-bold text-white">Groq</td>
@@ -562,7 +562,7 @@ export default function HomePage() {
                 <td className="p-4 font-bold text-white">Gemini Pro</td>
                 <td className="p-4 text-emerald-400">"gemini_pro"</td>
                 <td className="p-4"><span className="px-2 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20 text-xs">Paid</span></td>
-                <td className="p-4">gemini-2.5-pro</td>
+                <td className="p-4">gemini-3.1-pro-preview</td>
                 <td className="p-4 text-neutral-400">GCP Enterprise Pay-as-you-go</td>
               </tr>
             </tbody>
