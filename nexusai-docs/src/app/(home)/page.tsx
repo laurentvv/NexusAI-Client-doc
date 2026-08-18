@@ -355,7 +355,7 @@ export default function HomePage() {
             <div className="p-4 rounded-xl border border-teal-500/30 bg-teal-500/[0.02] flex items-center justify-between">
               <div>
                 <div className="font-bold text-white">Google Gemini Pro</div>
-                <div className="text-xs text-neutral-400 font-mono mt-0.5">Gemini 2.5 Pro • Enterprise GCP Pay-as-you-go</div>
+                <div className="text-xs text-neutral-400 font-mono mt-0.5">Gemini 3.1 Pro • Enterprise GCP Pay-as-you-go</div>
               </div>
               <span className="text-xs font-mono px-2.5 py-1 rounded bg-teal-500/10 text-teal-300 border border-teal-500/20">Backup #2</span>
             </div>
@@ -559,7 +559,7 @@ export default function HomePage() {
                 <td className="p-4 text-neutral-400">$0.27 / 1M tokens • Real-time Balance</td>
               </tr>
               <tr>
-                <td className="p-4 font-bold text-white">Gemini Pro</td>
+                <td className="p-4 font-bold text-white">Google Gemini Pro</td>
                 <td className="p-4 text-emerald-400">"gemini_pro"</td>
                 <td className="p-4"><span className="px-2 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20 text-xs">Paid</span></td>
                 <td className="p-4">gemini-3.1-pro-preview</td>
