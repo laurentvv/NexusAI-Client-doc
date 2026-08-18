@@ -22,7 +22,7 @@ NexusAI-Client unifies leading zero-cost tiers and high-performance commercial A
 | **Mistral AI** | `"mistral"`, `"mistral_free"` | Free / Paid | OpenAI Chat API | `mistral-small-latest` | ✅ | ✅ | Free Dev Models (`codestral-latest`, etc.) |
 | **Nvidia NIM** | `"nvidia_free"`, `"nvidia"` | Free | OpenAI Chat API | `meta/llama-3.1-8b-instruct` | ✅ | ✅ | 1,000 Free GPU Credits (NGC) |
 | **OpenRouter** | `"openrouter"`, `"openrouter_free"` | Free / Paid | OpenAI Chat API | `openrouter/free` | ✅ | ✅ | 19 Free Models + 390 Commercial Models |
-| **OrcaRouter** | `"orcarouter"`, `"orcarouter_free"` | Free / Paid | OpenAI Chat API | `qwen/qwen3.8-27b-free` | ❌ | ✅ | Zero-margin routing + Free tier models (`-free`) |
+| **OrcaRouter** | `"orcarouter"`, `"orcarouter_free"` | Free / Paid | OpenAI Chat API | `qwen/qwen3.8-27b-free` | ✅ | ✅ | Zero-margin routing + Free tier models (`-free`) |
 
 ---
 
@@ -118,6 +118,7 @@ async with AIGateway("groq") as client:
 
 ### 10. OrcaRouter (`"orcarouter"`)
 - **Key Advantage**: Multi-provider zero-margin gateway offering transparent routing and access to high-performance free models (`qwen/qwen3.8-27b-free`, DeepSeek, Llama).
+- **Vision Support**: Supported via **Qwen 3.8 Vision** multimodal models.
 - **Free Models Detection**: Automatically detects zero-cost models ending with `-free` or `:free`.
 - **Protocol**: OpenAI-compatible REST API (`https://api.orcarouter.ai/v1`).
 - **Quota & Balance**: Fixed minute/daily windows with prompt token limit inspection.

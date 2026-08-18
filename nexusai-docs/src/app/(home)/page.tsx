@@ -139,6 +139,7 @@ import asyncio
 from nexusai_client import AIGateway
 
 async def main():
+    # Automatically selects the best Vision model (Gemini 2.5 Flash, Llama 3.2 Vision, Qwen 3.8 Vision, Aya Vision, Pixtral)
     async with AIGateway.auto_fallback_vision() as client:
         res = await client.analyze_image(
             prompt="Extract the invoice line items and total as JSON.",
@@ -534,7 +535,7 @@ export default function HomePage() {
                 <td className="p-4 text-emerald-400">"orcarouter"</td>
                 <td className="p-4"><span className="px-2 py-0.5 rounded bg-teal-500/10 text-teal-300 border border-teal-500/20 text-xs">Free / Paid</span></td>
                 <td className="p-4">qwen/qwen3.8-27b-free</td>
-                <td className="p-4 text-neutral-400">Zero-Margin Gateway • Free Models (-free)</td>
+                <td className="p-4 text-neutral-400">Zero-Margin Gateway • Qwen 3.8 Vision • Free Models (-free)</td>
               </tr>
               <tr>
                 <td className="p-4 font-bold text-white">Cohere</td>

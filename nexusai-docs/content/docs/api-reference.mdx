@@ -19,7 +19,7 @@ The primary entry point and factory class.
 Automatically discovers all active keys in the environment, builds a failover chain prioritizing zero-cost free tiers before paid models, and returns an initialized `FallbackGateway`.
 
 #### `AIGateway.auto_fallback_vision(*, prioritize_free: bool = True, timeout: float = 60.0, **kwargs) -> FallbackGateway`
-Builds an automatic failover chain across active multimodal vision providers (`gemini_free`, `nvidia_free`, `cohere_free`, `mistral`, `openrouter`, `gemini_pro`).
+Builds an automatic failover chain across active multimodal vision providers (`gemini_free`, `nvidia_free`, `orcarouter_free`, `orcarouter`, `cohere_free`, `mistral`, `openrouter`, `gemini_pro`).
 
 #### `AIGateway.with_fallback(providers: list[str | BaseAIProvider], *, timeout: float = 60.0, **kwargs) -> FallbackGateway`
 Instantiates a `FallbackGateway` with an explicit list of provider identifiers or instances.
